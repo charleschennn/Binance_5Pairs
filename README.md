@@ -11,4 +11,6 @@ To install
 to enable API requests from Binance using python
 
 ## Execution
-python3 main.py
+```javascript
+  python3 main.py
+```
