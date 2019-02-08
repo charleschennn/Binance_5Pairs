@@ -14,3 +14,8 @@ to enable API requests from Binance using python
 ```javascript
   python3 main.py
 ```
+
+## Continuously Running in Background
+```javascript
+  nohup python3 main.py &
+```
