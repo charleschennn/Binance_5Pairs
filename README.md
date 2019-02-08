@@ -20,7 +20,7 @@ to enable API requests from Binance using python
   nohup python3 main.py &
 ```
 
-## Connect to AWS ssh
+## Connect to AWS SSH
 ```javascript
   ssh -i /Users/charles/Desktop/binance/binance.pem ubuntu@ec2-13-231-93-51.ap-northeast-1.compute.amazonaws.com
 ```
