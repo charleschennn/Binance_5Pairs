@@ -8,10 +8,9 @@ import datetime
 import threading
 import global_var
 import make_transaction
-
+import operator
 
 if __name__ == "__main__":
-
     
     while True:
 
@@ -38,13 +37,19 @@ if __name__ == "__main__":
         t5.join()
         t6.join()
 
-        maximum = max(global_var.largest_set, key=global_var.largest_set.get)
-        print("The Largest Pair : {}, 粗利率 : {}".format(maximum, global_var.largest_set[maximum]))
-        maximum = maximum.split("-")
+        # get the best 6 pairs of currency
+        sorted_d = sorted(global_var.largest_set.items(), key=operator.itemgetter(1), reverse=True)
+        sorted_dict = {}
+        for i in range(5):
+            print(sorted_d[i][0])
+            sorted_dict.update({ sorted_d[i][0] : sorted_d[i][1]})
 
-        numerator = maximum[0]
-        denominator = maximum[1]
-        X = maximum[2]
+        # print(sorted_d[0][0])
+        # print(sorted_d[1][1])
+        # print(sorted_d[2])
+        # print(sorted_d[3])
+        # print(sorted_d[4])
+        # print(sorted_d[5])
 
         # bid_and_ask = bidPrice_and_askPrice(numerator, denominator)
         # bid = bid_and_ask[0]
@@ -52,49 +57,132 @@ if __name__ == "__main__":
 
         global_var.start_time = datetime.datetime.now()
 
+        now_plus_1 = global_var.start_time + datetime.timedelta(minutes = 1)
+        now_plus_8 = global_var.start_time + datetime.timedelta(minutes = 8)
         now_plus_10 = global_var.start_time + datetime.timedelta(minutes = 10)
+
         # lock = threading.Lock()
 
         print("Checking the rate condition, make transaction if the most updated rate is profitable.. ")
-        print(datetime.datetime.now())
+        
+        maximum = max(global_var.largest_set, key=global_var.largest_set.get)
+        print(maximum)
+        print("Start : {}".format(datetime.datetime.now()))
 
         while datetime.datetime.now() < now_plus_10:
 
-            value = float(calculate_profit(X, numerator, denominator)[1])
-            # real
-            if value > 0.0035 : 
+            if datetime.datetime.now() > now_plus_1 and datetime.datetime.now() < now_plus_8:
 
-            # testing purpose
-            # if value > 0:
+                # print("1 Minute : {}".format(datetime.datetime.now()))
 
-                print("{} > 0.0035, making transaction..".format(value))
+                # maximum = max(sorted_dict, key=sorted_dict.get)
 
-                initial_cost = set_initial_cost(True, X, numerator, denominator)
+                # print("The Largest Pair : {}, 粗利率 : {}".format(maximum, sorted_dict[maximum]))
+                # maximum_list = maximum.split("-")
 
-                transaction1=threading.Thread(target=make_transaction.transaction1(initial_cost, X, denominator ))
-                transaction1.start()
-                transaction1.join()
+                five_pairs = {}
 
-                transaction2=threading.Thread(target=make_transaction.transaction2(X, numerator ))
-                transaction2.start()
-                transaction2.join()
+                # print(sorted_dict)
+                for key in sorted_dict:
+                    k = key.split("-")
+                    numerator = k[0]
+                    denominator = k[1]
+                    X = k[2]
+                    value_temp = float(calculate_profit(X, numerator, denominator)[1])
+                    five_pairs.update( { numerator+"-"+denominator+"-"+X : value_temp } )
 
-                transaction3=threading.Thread(target=make_transaction.transaction3(numerator, denominator ))
-                transaction3.start()
-                transaction3.join()
-
-                # transaction were made, reset the timer and keep checking the same pair until the 10 minutes requirement is passed again
-                now_plus_10 = datetime.datetime.now() + datetime.timedelta(minutes = 10)
+                maximum = max( five_pairs, key=five_pairs.get )
+                value = five_pairs.get(maximum)
                 
-                # use denominator currency to buy X
-                # sell X to get numerator
-                # sell numerator to get denominator
+                # print(maximum)
+                # print("value : {}".format(value))
+
+                # real
+                if value > 0.003 : 
+
+                # testing purpose
+                # if value > 0:
+
+                    maximum_list = maximum.split("-")
+                    numerator = maximum_list[0]
+                    denominator = maximum_list[1]
+                    X = maximum_list[2]
+
+                    print("{} > 0.003, making transaction..".format(value))
+
+                    initial_cost = set_initial_cost(True, X, numerator, denominator)
+
+                    transaction1=threading.Thread(target=make_transaction.transaction1(initial_cost, X, denominator ))
+                    transaction1.start()
+                    transaction1.join()
+
+                    transaction2=threading.Thread(target=make_transaction.transaction2(X, numerator ))
+                    transaction2.start()
+                    transaction2.join()
+
+                    transaction3=threading.Thread(target=make_transaction.transaction3(numerator, denominator ))
+                    transaction3.start()
+                    transaction3.join()
+
+                    # transaction were made, reset the timer and keep checking the same pair until the 10 minutes requirement is passed again
+                    # now_plus_10 = datetime.datetime.now() + datetime.timedelta(minutes = 10)
+                    
+                    # use denominator currency to buy X
+                    # sell X to get numerator
+                    # sell numerator to get denominator
+                else:
+                    time.sleep(1)
+                    print("{}  < 0.003, Pair : {}, rechecking the latest rate..".format(value, maximum))
+                    continue
+
             else:
-                time.sleep(1)
-                print("{}  < 0.0035 , recheck the latest rate of {}-{}-{} pair to check the profit..".format(value, numerator, denominator, X))
-                continue
+
+                maximum_list = maximum.split("-")
+
+                numerator = maximum_list[0]
+                denominator = maximum_list[1]
+                X = maximum_list[2]
+
+                value = float(calculate_profit(X, numerator, denominator)[1])
+                # print("The Largest Pair : {}, 粗利率 : {}".format(maximum, value))
+
+                # real
+                if value > 0.003 : 
+
+                # testing purpose
+                # if value > 0:
+
+                    print("{} > 0.003, making transaction..".format(value))
+
+                    initial_cost = set_initial_cost(True, X, numerator, denominator)
+
+                    transaction1=threading.Thread(target=make_transaction.transaction1(initial_cost, X, denominator ))
+                    transaction1.start()
+                    transaction1.join()
+
+                    transaction2=threading.Thread(target=make_transaction.transaction2(X, numerator ))
+                    transaction2.start()
+                    transaction2.join()
+
+                    transaction3=threading.Thread(target=make_transaction.transaction3(numerator, denominator ))
+                    transaction3.start()
+                    transaction3.join()
+
+                    # transaction were made, reset the timer and keep checking the same pair until the 10 minutes requirement is passed again
+                    # now_plus_1 = global_var.start_time + datetime.timedelta(minutes = 1)
+                    # now_plus_8 = global_var.start_time + datetime.timedelta(minutes = 8)
+                    # now_plus_10 = datetime.datetime.now() + datetime.timedelta(minutes = 10)
+                    
+                    # use denominator currency to buy X
+                    # sell X to get numerator
+                    # sell numerator to get denominator
+                else:
+                    time.sleep(1)
+                    print("{}  < 0.003, Pair : {}-{}-{}, rechecking the latest rate..".format(value, numerator, denominator, X))
+                    continue
+    
         
-        print("10 minutes has passed and no transaction was been made, recheck the new currency pair now ")
+        print("No transaction was made in the last 10 minutes, recheck the new currency pair now..")
         print(datetime.datetime.now())
 
         # keep checking the rate condition periodically for 10 minutes 
