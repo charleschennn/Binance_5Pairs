@@ -89,7 +89,7 @@ def transaction1(initial_cost, X, main_currency ):
 
     transaction_fee = 0
 
-    if X or main_currency == "BNB":
+    if X == "BNB" or main_currency == "BNB":
         transaction_fee = format(float(amount_x_from_main) * 0.00075, '.8f')
         amount_x_from_main = float(amount_x_from_main) * 0.99925
     # else:
@@ -173,7 +173,7 @@ def transaction2(X, mid_currency ):
  
     transaction_fee = 0
 
-    if X or mid_currency == "BNB":
+    if X == "BNB" or mid_currency == "BNB":
         transaction_fee = format(float(amount_mid_from_x) * 0.00075, '.8f')
         amount_mid_from_x = float(amount_mid_from_x) * 0.99925
     # else:
@@ -262,7 +262,7 @@ def transaction3(mid_currency, main_currency ):
 
     transaction_fee = 0
 
-    if mid_currency or main_currency == "BNB":
+    if mid_currency == "BNB" or main_currency == "BNB":
         transaction_fee = format(float(amount_mid_from_x) * 0.00075, '.8f')
         amount_mid_from_x = float(amount_mid_from_x) * 0.99925
     # else:
